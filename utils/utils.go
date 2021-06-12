@@ -39,6 +39,11 @@ func runEnvCmd(mode string, env []string, command string, arg ...string) error {
 	if mode == "cli" {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
+	} else {
+		f, _ := os.OpenFile("/var/log/utm-setup.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		defer f.Close()
+		cmd.Stdout = f
+		cmd.Stderr = f
 	}
 	return cmd.Run()
 }
@@ -122,7 +127,7 @@ func InstallProbe(mode, datadir, pass, host string) error {
 		"SCANNER_IFACE=" + mainIface,
 		"RSYSLOG_LOGS=" + rsyslogLogs,
 		"SCANNER_IP=" + mainIP,
-		"CORRElATION_URL=http://"+host+":9090",
+		"CORRElATION_URL=http://" + host + ":9090",
 	}
 
 	if err := installScanner(mode); err != nil {
